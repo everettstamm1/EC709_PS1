@@ -19,6 +19,8 @@
 \author{Everett Stamm}
 \begin{document}
 \maketitle
+\section*{Note}
+I can't actually figure out how to export glmnet or locfit results to a latex table so I'm just describing them in this document. All results can be found in code.R or on \url{https://github.com/everettstamm1/EC709_PS1}
 \section{Question 1}
 \subsection{Part 1}
 Omitted.
@@ -127,7 +129,7 @@ E[Variance] =E[ \frac{1}{1000h}\frac{(3/5) \sigma^2(x)}{ f_0(x)}] = \frac{1}{100
 \section{Question 2}
 
 \subsection{Part 1}
-In code.R, I optimized the local linear regression over bandwidth values of $(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8)$ and the power and bspline regressions 1-7 knots. The optimal values were 0.1 for local linear, 7 for power, and 1 for bspline.
+In code.R, I optimized the local linear regression over bandwidth values of $(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8)$ and the power and bspline regressions over 1-7 knots. The optimal values were 0.1 for local linear, 7 for power, and 1 for bspline.
 \begin{figure}
 	\centering
 	\includegraphics{Q2_1.png}
@@ -135,7 +137,7 @@ In code.R, I optimized the local linear regression over bandwidth values of $(0.
 \subsection{Part 2}
 With the price set to 0.57. I get betas of 5.34, 5.36, and 5.37 with standard errors of 0.02 0.016, and 0.013 for local linear, power, and bspline regressions, respectively.
 \subsection{Part 3}
-Again in code.R, I optimized the local linear regression over bandwidth values of $(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8)$ and the power and bspline regressions 1-7 knots. The optimal values were 0.1 for local linear, 7 for power, and for bspline.
+Again in code.R, I optimized the local linear regression over bandwidth values of $(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8)$ and the power and bspline regressions over 1-7 knots. The optimal values were 0.1 for local linear, 7 for power, and 1 for bspline.
 \subsection{Part 4}
 In the standard lasso, the coefficient on log price is $-0.554$, while in the two-way one it's fixed at zero. That said, there are coefficients of -0.253, -0.057, and 0.125 on the interaction of log price and driver, hhsize, and urban, respectively.
 \section{Question 3}
