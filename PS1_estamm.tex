@@ -1,0 +1,138 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+\usepackage{threeparttable}
+\usepackage{algorithmic}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{amsfonts}
+\usepackage{amsmath,amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+
+\title{EC709 PS1}
+\author{Everett Stamm}
+\begin{document}
+\maketitle
+\section{Question 1}
+\subsection{Part 1}
+Omitted.
+\subsection{Part 2}
+From the slides, recall that
+\[
+\hat{g}_h(x) = e_1'(X'W X)^{-1}X'WY
+\]
+Where $e_1$ is $(r+1) \times 1$ vector with $1$ in the first entry and zeros elsewhere and $W = diag(K_h(x-X_1), \dots, K_h(x - X_n))$. Add and subtract a $g_0 = (g_0(X_1), \dots, g_0(X_n))'$ to this and square to get MSE:
+\[
+MSE = E[(\hat{g}_h(x) - g_0(x))^2 | X_i ] = e_1'(X'WX)^{-1}X'W \Sigma W X (X'WX)^{-1} e_1 + \Big(e'_1 (X'WX)^{-1}X'Wg_0 - g_0(x)\Big)^2
+\]
+Where the first term is the variance and the second is the bias squared. Also $\Sigma$ is an $N \times N$ diagonal matrix of the sample variances: $\Sigma = diag(\sigma^2(X_1), \dots, \sigma^2(X_n))$
+
+ Not get taylor approximation of $g(X_i)$
+\[
+g(X_i) \approx g_0(x) + g_0'(x)(X_i - x) +(1/2) g_0''(x)(X_i-x)^2
+\]
+Rename $r_i =(1/2) g_0''(x)(X_i - x)^2 = g_0(X_i) - g_0(x) - g_0'(x)(X_i - x)$. Thus we can rewrite:
+\begin{align*}
+	g_0(X_i) = g_0(x) - g_0'(x)(X_i - x) + r_i
+\end{align*}
+Since $X e_1 = (1, \dots, 1)'$ and $X e_2 = (X_1 - x, \dots, X_n - x)'$, we can write the above in vector form:
+\[
+g_0 =X e_1 g_0(x) - X e_2 g_0'(x) + r
+\]
+And substitute into the equation for bias 
+\begin{align*}
+Bias = e_1'(X'WX)^{-1}X'Wg_0 - g_0(x) =  \\
+e_1'(X'WX)^{-1}X'W(X e_1 g_0(x) - X e_2 g_0'(x) + r) - g_0(x) = e_1'(X'WX)^{-1}X'Wr
+\end{align*}
+
+Now we need a corrolary: from the "weighted average" section of the notes we can see that
+\[
+S_j = W ((x - X^j)^j) / h^j \sum_i K_h(x - X_i)(\frac{x - X_i}{h})^j
+\]
+Multiply, divide, do a change of variables $u = (x - x_i)/h$ and take the expectation to get that 
+\[
+E[S_j/(n h^j)] = \mu_j f_0(x) + o(1)
+\]
+For $\mu_j = \int u^j K(u) du$. Note that the asymptotic variance of this can be shown to have
+\[
+Var(S_j/(n h^j)) = E[(S_j/(n h^j))^2] - (E[S_j/(n h^j)])^2 \leq  E[(S_j/(n h^j))^2] 
+\leq \frac{1}{nh} \int u^{2j} K(u)^2 j_0(x - hu) du 
+\]
+The integral approaches some constant as $h \rightarrow 0$ and then $\frac{1}{nh} \rightarrow 0 $ as $nh \rightarrow \infty$, so the variance approaches zero. So we have that
+\[
+S_j/(nh^j) \rightarrow \mu_j f_0(x)+o(1)
+\]
+Now let $H = diag(1,h)$, so we have
+\[
+n^{-1} h^{-2} H^{-1} X' W r = n^{-1} h^{-2} H^{-1} X' S_2 (1/2) g_0''(x) \rightarrow (1/2) f_0(x) \begin{pmatrix} \mu_2 \\ 0 \end{pmatrix} g_0''(x) 
+\]
+
+We also have that as $h \rightarrow 0$ and $nh \rightarrow \infty$ 
+\[
+n^{-1}H^{-1}X' W X H^{-1} = n^{-1} \begin{bmatrix}
+S_0 & h^{-1} S_1 \\
+h^{-1} S_1 & h^{-2} S_2
+\end{bmatrix} \rightarrow f_0(x) \begin{bmatrix}
+ \mu_0 & \mu_1 \\
+\mu_1 & \mu_2
+\end{bmatrix}  = f_0(x) \begin{bmatrix}
+ 1 & 0 \\
+0 & \mu_2
+\end{bmatrix} 
+\]
+
+Now rearrange the bias equation
+\begin{align*}
+e_1'(X'WX)^{-1}X'Wr = e'_1 h^2 H^{-1} (n^{-1}H^{-1} X'W X H^{-1})^{-1} n^{-1} h^{-2} H^{-1} X' W r \rightarrow e'_1 h^2 H^{-1}\Big(f_0(x) \begin{bmatrix} 1 & 0 \\ 0 & \mu_2 \end{bmatrix} \Big)^{-1} (1/2) f_0(x) \begin{pmatrix} \mu_2 \\ 0 \end{pmatrix} g_0''(x) = \\
+g''_0(x) (h^2/2)e_1' H^{-1} \frac{1}{\mu_2}\begin{bmatrix} \mu_2 & 0 \\ 0 & 1 \end{bmatrix} \begin{pmatrix} \mu_2 \\ 0 \end{pmatrix} = g''_0(x)(h^2/2) \mu_2 + o(1)
+\end{align*}
+Forgot the $o(1)$ along the way but here it is again.
+
+Using what we learned for the bias, let's identify a new quantity:
+\[
+Q_j = \frac{h}{n} \sum_i K(x - X_i)^2 (\frac{x - X_i}{h})^j \sigma^2(x_i)
+\]
+Thus with change of variables $u = (x - X_i)/h$
+\[
+E[Q_j] = E[h K_h(x - X_i)^2  (\frac{x - X_i}{h})^j \sigma^2(x_i) ] = f_0(x) \sigma^2(x) \int u^j K(u)^2 du = f_0(x) \sigma^2(x) v_j
+\]
+Turns out that
+\[
+n^{-1} h H^{-1} X' W \Sigma W X H^{-1} = \begin{bmatrix} Q_0 & 0 \\ 0 & Q_2 \end{bmatrix}
+\]
+So then the variance equation becomes
+\begin{align*}
+e_1'(X'WX)^{-1}X'W \Sigma W X (X'WX)^{-1} e_1 = n^{-1}h^{-1}e'_1 H^{-1} \Big(\frac{H^{-1} X' W X H^{-1}}{n}\Big) \Big(\frac{h H^{-1} X'W \Sigma W X H^{-1}}{n} \Big) \Big(\frac{H^{-1} X' W X H^{-1}}{n}\Big)H^{-1} e_1 \rightarrow \\
+n^{-1} h^{-1}e_1'(f_0(x) \begin{bmatrix} 1 & 0 \\ 0 & \mu_2 \end{bmatrix})^{-1} \begin{bmatrix} Q_0 & 0 \\ 0 & Q_2 \end{bmatrix}(f_0(x) \begin{bmatrix} 1 & 0 \\ 0 & \mu_2 \end{bmatrix})^{-1}e_1 = n^{-1}h^{-1} \frac{v_0 \sigma^2(x)}{f_0(x)} + o(1)
+\end{align*}
+\subsection{Part 3}
+Below is the table of simulated values. 
+\input{q13.tex}
+\subsection{Part 4}
+Asymptotic theory would predict the following for local linear regression:
+\[
+E[Bias] = E[g_0''(x)(h^2/2)\mu_2] = E[\exp(X)(h^2/2) (1/5)] = (h^2/2) (1/5)(\exp(1) - \exp(0))
+\]
+Thus for $h = (0.05,0.1,0.15,0.2)$ we'd expect $Bias = (0.0004,0.0017,0.0039,0.0067)$. Kinda makes sense that since we're holding $n$ constant while $h \rightarrow 0$, the values get further from their true value. Similarly:
+\[
+E[Variance] =E[ \frac{1}{1000h}\frac{(3/5) \sigma^2(x)}{ f_0(x)}] = \frac{1}{1000h}\frac{(3/5) 0.5^2/12}{0.5}
+\]
+ 
+\section{Question 2}
+\subsection{Part 1}
+\subsection{Part 2}
+\subsection{Part 3}
+\subsection{Part 4}
+\section{Question 3}
+\subsection{Part 1}
+\subsection{Part 2}
+\subsection{Part 3}
+\subsection{Part 4}
+\subsection{Part 5}
+\end{document}
