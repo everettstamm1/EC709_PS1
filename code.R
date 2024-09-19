@@ -93,7 +93,7 @@ crossvalidate <- function(h,X,Y,type){
       
       ff <- as.formula(paste("Y ~ poly(", paste0("X",1:nx, collapse = ", "),", degree = ",h,")" ))
       mod <- lm(data = train, ff)
-      X_test_final <- rbind(select(test,-Y),c(0,0))
+      X_test_final <- rbind(select(test,-Y),rep(0,nx))
       Y_pred <- predict(mod,newdata = X_test_final)[1]
       
     }
@@ -103,14 +103,14 @@ crossvalidate <- function(h,X,Y,type){
       
       ff <- as.formula(paste("Y ~ ", paste0("bs(X",1:nx,", knots = ",h,")", collapse = " + ")))
       mod <- lm(data = train, ff)
-      X_test_final <- rbind(select(test,-Y),c(0,0))
+      X_test_final <- rbind(select(test,-Y),rep(0,nx))
       Y_pred <- predict(mod,newdata = X_test_final)[1]
       
     }
     loss[i] <- (Y_test[[1]][1] - Y_pred)^2
     
   }
-  return(mean(loss))
+  return(mean(loss,na.rm = T))
 }
 
 h_kern <- 1:8*0.1
@@ -137,14 +137,13 @@ bsplineloss_2_1<- foreach(a=h_bspline, .packages = c('splines','locfit','dplyr')
   crossvalidate(a,X,Y,'bspline')
 }
 
-
 locmin_2_1 <- which.min(locloss_2_1)
 powermin_2_1 <- which.min(powerloss_2_1)
 bsplinemin_2_1 <- which.min(bsplineloss_2_1)
 
 loc_2_1 <- locfit(data = df, lgas ~ lp(lprice, degree = 1, bandwidth = h_loc[locmin_2_1]))
 power_2_1 <- lm(data = df,lgas ~ poly(lprice, degree = h_power[powermin_2_1]))
-bspline_2_1 <- lm(data = df,lgas ~ bs(lprice, knots = h_bspline[bsplinemin_2_1]))
+bspline_2_1 <- lm(data = df,lgas ~ bs(lprice, knots = h_bspline[1]))
 
 # Create a sequence of lprice values for prediction
 lprice_pred <- seq(min(df$lprice), max(df$lprice), length.out = 100)
@@ -165,6 +164,7 @@ legend("bottomright", legend=c("Local linear",'Power Series','BSpline'),
        col=c("red", "blue",'green'), lty=c(1,2), lwd=c(2,1))
 dev.off()
 
+# Q2.2
 X_new <- log(0.57)
 
 Y_pred_loc <- predict(loc_2_1, se.fit = TRUE, data.frame(lprice = X_new))
@@ -173,7 +173,7 @@ Y_pred_bspline <- predict(bspline_2_1, se.fit = TRUE,data.frame(lprice = X_new))
 
 
 
-
+# Q2.3
 X <- df %>% select(lprice,lincome)
 Y <- df %>% select(lgas)
 
@@ -199,6 +199,7 @@ locmin_2_3 <- which.min(locloss_2_3)
 loc_2_3 <- locfit(data = df, lgas ~ lp(lprice, lincome, degree = 1, bandwidth = h_loc[locmin_2_3]))
 power_2_3 <- lm(data = df,lgas ~ poly(lprice, lincome, degree = h_power[powermin_2_3]))
 bspline_2_3 <- lm(data = df,lgas ~ bs(lprice, knots = h_bspline[bsplinemin_2_3]) +  bs(lincome, knots = h_bspline[bsplinemin_2_3]))
+
 
 #2.4
 lasso <- rlasso(data = df ,lgas ~ lprice + age + driver + hhsize + fueltype + urban + prov + year , post = FALSE)  # use lasso, not-Post-lasso
